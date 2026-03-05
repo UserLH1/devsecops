@@ -1,0 +1,15 @@
+name: List Files Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  list-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run ls -la
+        run: ls -la
