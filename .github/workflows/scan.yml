@@ -1,0 +1,70 @@
+name: WordPress WPScan Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  wordpress-wpscan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker environment
+        run: |
+          sudo systemctl start docker
+          docker version
+
+      - name: Start MySQL container
+        run: |
+          docker run -d --name wp-db \
+            -e MYSQL_ROOT_PASSWORD=password \
+            -e MYSQL_DATABASE=wordpress \
+            -e MYSQL_USER=wpuser \
+            -e MYSQL_PASSWORD=wppass \
+            -p 3306:3306 \
+            mysql:5.7
+
+      - name: Start WordPress container
+        run: |
+          docker run -d --name wp-site \
+            --link wp-db:mysql \
+            -e WORDPRESS_DB_HOST=wp-db:3306 \
+            -e WORDPRESS_DB_USER=wpuser \
+            -e WORDPRESS_DB_PASSWORD=wppass \
+            -e WORDPRESS_DB_NAME=wordpress \
+            -p 8080:80 \
+            wordpress:latest
+
+      - name: Wait for WordPress to be ready
+        run: |
+          echo "Waiting for WordPress to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8080/wp-login.php | grep -q "wp-submit"; then
+              echo "WordPress is ready!"
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Run WPScan
+        run: |
+          mkdir -p scans
+          docker run --rm --network host wpscanteam/wpscan \
+            --url http://localhost:8080 \
+            --enumerate u,vp,vt \
+            --force \
+            --api-token ${{ secrets.WPSCAN_API_TOKEN }} \
+            --format json \
+            --out /scans/wpscan-report.json || true
+          
+      - name: Upload WPScan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wpscan-report
+          path: scans/wpscan-report.json
