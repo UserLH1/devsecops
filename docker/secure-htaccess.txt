@@ -1,0 +1,13 @@
+<Files xmlrpc.php>
+Order Allow, Deny
+Deny from all
+</Files>
+
+<FilesMatch "^(readme\.html|license\.txt|wp-config\.php)$">
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+RewriteEngine On
+RewriteCond %{QUERY_STRING} (author=\d+) [NC]
+RewriteRule .* - [F]
