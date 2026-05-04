@@ -52,6 +52,20 @@ jobs:
             sleep 5
           done
 
+      - name: Auto-configure WordPress
+        run: |
+          echo "Installing WP-CLI..."
+          docker exec wp-site curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          docker exec wp-site chmod +x wp-cli.phar
+          echo "Running WordPress installation..."
+          docker exec wp-site ./wp-cli.phar core install \
+            --url="http://localhost:8080" \
+            --title="DevSecOps Lab" \
+            --admin_user="horatiu" \
+            --admin_password="Parola123!" \
+            --admin_email="lazeahoratiu@gmail.com" \
+            --allow-root
+
       - name: Run WPScan
         run: |
           mkdir -p scans
