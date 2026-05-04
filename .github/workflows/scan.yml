@@ -55,6 +55,7 @@ jobs:
       - name: Run WPScan
         run: |
           mkdir -p scans
+          chmod 777 scans
           docker run --rm --network host wpscanteam/wpscan \
             --url http://localhost:8080 \
             --enumerate u,vp,vt \
