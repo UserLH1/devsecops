@@ -1,11 +1,9 @@
 <Files xmlrpc.php>
-Order Allow, Deny
-Deny from all
+Require all denied
 </Files>
 
 <FilesMatch "^(readme\.html|license\.txt|wp-config\.php)$">
-Order Allow,Deny
-Deny from all
+Require all denied
 </FilesMatch>
 
 RewriteEngine On
