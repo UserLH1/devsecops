@@ -61,7 +61,7 @@ jobs:
             --force \
             --api-token ${{ secrets.WPSCAN_API_TOKEN }} \
             --format json \
-            --o /scans/wpscan-report.json || true
+            -o /scans/wpscan-report.json || true
           
       - name: Upload WPScan Artifact
         uses: actions/upload-artifact@v4
