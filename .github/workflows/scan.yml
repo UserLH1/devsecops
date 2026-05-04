@@ -32,12 +32,10 @@ jobs:
 
       - name: Build hardened WordPress image
         run: |
-          # Construim imaginea folosind folderul "docker" unde am pus Dockerfile și .htaccess
           docker build -t hardened-wordpress:latest ./docker
 
       - name: Start WordPress container
         run: |
-          # Pornim containerul folosind imaginea noastră securizată (hardened-wordpress:latest)
           docker run -d --name wp-site \
             --link wp-db:mysql \
             -e WORDPRESS_DB_HOST=wp-db:3306 \
